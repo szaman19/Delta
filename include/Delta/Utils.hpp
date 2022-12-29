@@ -38,22 +38,22 @@ namespace Delta{
     friend bool operator==(const Shape<U...>& lhs, const Shape<V...>& rhs);
   };
 
-  template <typename... T>
-  std::ostream& operator<<(std::ostream& os, const Shape<T...>& shape){
-    os << '(';
-    const auto& dims = shape.m_dims; 
-    const auto size = dims.size();
+    template <typename... T>
+    std::ostream& operator<<(std::ostream& os, const Shape<T...>& shape){
+      os << '(';
+      const auto& dims = shape.m_dims; 
+      const auto size = dims.size();
 
-    if (size == 1){
-      return os << dims[0] << ")" << std::endl;
-    }
+      if (size == 1){
+        return os << dims[0] << ")" << std::endl;
+      }
 
-    for (auto iter = dims.begin(); iter != dims.end()-1; iter++){
-      os << *iter << ", "; 
+      for (auto iter = dims.begin(); iter != dims.end()-1; iter++){
+        os << *iter << ", "; 
+      }
+        os << *(dims.end()-1) << ')'<<std::endl;
+      return os;
     }
-      os << *(dims.end()-1) << ')'<<std::endl;
-    return os;
-  }
 
 
   template <typename... U, typename... V>
