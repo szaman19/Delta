@@ -3,11 +3,41 @@
 #include <iostream>
 #include <vector>
 
+#ifndef NDEBUG
+#   define Delta_Assert(condition, message) \
+    do { \
+        if (! (condition)) { \
+            std::cerr << "Assertion `" #condition "` failed in " << __FILE__ \
+                      << " line " << __LINE__ << ": " << message << std::endl; \
+            std::terminate(); \
+        } \
+    } while (false)
+#else
+#   define Delta_Assert(condition, message) do { } while (false)
+#endif
+
 namespace Delta{
   enum Device {
     CPU,
     GPU
   };
+
+  template<typename T>
+  std::ostream& vec_to_str(const T* vector, const int& num_elem){
+    std::ostream& os = std::cout;
+    os << "[";
+
+    if (num_elem == 1){
+      os << vector[0] << "]";
+      return os;
+    }
+
+    for (auto i = 0; i < num_elem-1; ++i){
+      os << vector[i] << ", ";
+    }
+    os << vector[num_elem-1]<< "]";
+    return os;
+  }
 
   template <typename... Args>
   struct Shape{
@@ -18,6 +48,7 @@ namespace Delta{
       m_dims = {std::forward<Args>(args)...};
     }
     Shape(std::vector<int> dims):m_dims(dims){}
+    Shape(std::initializer_list<int> dims):m_dims(dims){}
     
     /* Rule of Three */
     ~Shape() = default;
@@ -40,19 +71,9 @@ namespace Delta{
 
     template <typename... T>
     std::ostream& operator<<(std::ostream& os, const Shape<T...>& shape){
-      os << '(';
       const auto& dims = shape.m_dims; 
       const auto size = dims.size();
-
-      if (size == 1){
-        return os << dims[0] << ")" << std::endl;
-      }
-
-      for (auto iter = dims.begin(); iter != dims.end()-1; iter++){
-        os << *iter << ", "; 
-      }
-        os << *(dims.end()-1) << ')'<<std::endl;
-      return os;
+      return vec_to_str<int> (dims.data(), size);
     }
 
 

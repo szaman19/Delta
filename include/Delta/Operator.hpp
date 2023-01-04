@@ -15,6 +15,15 @@ namespace Delta{
   public:
     Operator(/* args */);
     ~Operator();
+    void backward(const Container* upstream_tensor){
+      backward_impl(upstream_tensor);
+    }
+
+    void backward(){
+      backward_impl();
+    }
+    virtual void backward_impl(const Container* upstream_tensor) = 0;
+    virtual void backward_impl() = 0;
   };
   
   template <typename Container>
