@@ -13,7 +13,6 @@ Autograd example with reference CPU implementation
 // Maybe think about having the ability to switch impl would be nice.
 using Tensor_Impl = Delta::Tensor_CPU_Impl<float>;
 using Tensor = Delta::Tensor<float, Tensor_Impl>;
-using Sum_Op = Delta::Sum_CPU_impl<float>;
 
 int main(int argc, char const *argv[]){
 
