@@ -13,25 +13,19 @@ namespace Delta{
   private:
     /* data */
   public:
-    Operator(/* args */);
-    ~Operator();
-    void backward(const Container* upstream_tensor){
-      backward_impl(upstream_tensor);
-    }
 
-    void backward(){
-      backward_impl();
+    Operator(/* args */) = default;
+    ~Operator() = default;
+    virtual std::string GetName(){
+      return "Abstract Operator";
     }
-    virtual void backward_impl(const Container* upstream_tensor) = 0;
-    virtual void backward_impl() = 0;
+    virtual void backward(Container* upstream_tensor){
+      // TO DO: Make into an error
+      std::cout << "Calling backward on an abstract operator makes no sense...\n";
+    };
+    virtual void backward(){
+      // TO DO: Make into an error
+      std::cout << "Calling backward on an abstract operator makes no sense...\n";
+    };
   };
-  
-  template <typename Container>
-  Operator<Container>::Operator(/* args */){
-  }
-
-  template <typename Container>
-  Operator<Container>::~Operator(){
-  }
-  
 } // namespace Delta

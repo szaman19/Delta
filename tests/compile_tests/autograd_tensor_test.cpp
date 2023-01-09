@@ -9,23 +9,29 @@ using Tensor = Delta::Tensor<float, Tensor_Impl>;
 using Sum_Op = Delta::Sum_CPU_impl<float>;
 
 int main(int argc, char const *argv[]){
-  auto tensor_1 = Tensor({2, 2, 2}, false); // Create a tensor of zeros, with gradient turned off
 
-  std::cout << "The shape of the tensor is: "<<tensor_1.GetShape() << std::endl;
-  std::cout << "The size of the tensor is: "<< tensor_1.GetSize() << std::endl;
+  auto summand_1 = Tensor(1, {1}, true);
+  auto summand_2 = Tensor(2, {1}, true);
 
-  // Testing out the to-string capabilities
-  std::cout << "Printing out the elements: \n" <<tensor_1 << std::endl;  
+  std::cout << summand_1;
+  std::cout << summand_2;
 
-  auto summand_1 = Tensor({1}, true);
-  auto summand_2 = Tensor({1}, true);
-  auto sum_op = Sum_Op();
+  auto& res = Delta::Ops::Sum(summand_1, summand_2); // 2 + 1
 
-  auto& res = sum_op.forward(summand_1, summand_2);
+  std::cout << "Check: " << res.GetData()[0] <<" == " << 3 << std::endl;
 
-  std::cout << "The shape of tensor is: " << res.GetShape() << std::endl;
+  auto multiplier = Tensor(5, {1}, true);
+  
+  auto& out = Delta::Ops::Mul(res, multiplier);
 
-  res.Backward();
+  std::cout << "Check: " << out.GetData()[0] << " == " << 15 << std::endl;
+  out.Backward();
+
+  std::cout << "Check: " << out.GetGrad()[0] << " == " << 1 << '\n';
+  std::cout << "Check: " << res.GetGrad()[0] << " == " << 5 << '\n';
+  std::cout << "Check: " << multiplier.GetGrad()[0] << " == " << 3 << '\n';
+  std::cout << "Check: " << summand_1.GetGrad()[0] << " == " << 5 << '\n';
+  std::cout << "Check: " << summand_2.GetGrad()[0] << " == " << 5 << std::endl;
 
   return 0;
 }
