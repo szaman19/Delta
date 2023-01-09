@@ -79,11 +79,6 @@ namespace Delta{
       bool m_is_root;
       bool m_track_grad;
       Operator<AbstractTensor<DataType>>*  m_parent_op;
-
-    private:
-      void calculate_grad(){
-        static_cast<TensorImpl*>(this)->calculate_grad();
-      }
     
     public:
       /// @brief 
@@ -168,33 +163,7 @@ namespace Delta{
 
         if (m_track_grad){
           Fill_Grad(1, this->m_size);
-          // std::cout << "Calling backward 2\n";
-          m_parent_op->backward();
-          // std::cout << "Calling backward 3\n" << m_is_root << '\n';
-          if (!m_is_root){
-
-            for (auto i =0; i<m_parent_tensors.size(); ++i){
-              // std::cout << 
-              m_parent_tensors[i]->Backward(this);  
-            }
-          }
-        }
-      }
-
-      void Backward(Tensor* upstream_tensor){
-        
-        if (m_track_grad){
-          if (m_parent_op){
-              m_parent_op->backward(static_cast<AbstractTensor<DataType>*>(this));  
-          }
-          if (!m_is_root){
-            // std::cout << "Calling backward of non-leaf node\n";
-            for (auto i =0; i<m_parent_tensors.size(); ++i){
-              
-              m_parent_tensors[i]->Backward(this);  
-            }
-            // std::cout << "Finished calling backward of non-leaf node\n";
-          }
+          calculate_upstream_grad();
         }
       }
 
@@ -204,6 +173,22 @@ namespace Delta{
           os << " Gradient enabled \n";
         }
         return os;
+      }
+    
+    private:
+      void calculate_upstream_grad(){
+        if (m_track_grad){
+          if (m_parent_op){
+              m_parent_op->backward(static_cast<AbstractTensor<DataType>*>(this));  
+          }
+          if (!m_is_root){
+              // std::cout << "Calling backward of non-leaf node\n";
+              for (auto i =0; i<m_parent_tensors.size(); ++i){
+                m_parent_tensors[i]->calculate_upstream_grad();  
+              }
+              // std::cout << "Finished calling backward of non-leaf node\n";
+            }
+         }
       }
   };  // class definition Tensor
 
